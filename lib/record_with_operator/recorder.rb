@@ -42,7 +42,7 @@ module RecordWithOperator
               send("#{column}=", operator.id)
             end
 
-            belongs_to operator, {foreign_key: operator.sub(/\wr$/, 'ed_by'), class_name: RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options])
+            belongs_to operator, {foreign_key: operator.to_s.sub(/\wr$/, 'ed_by'), class_name: RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options])
             before_save "set_#{operator}"
           end
         end
