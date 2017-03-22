@@ -37,12 +37,14 @@ module RecordWithOperator
           belongs_to :deleter, {:foreign_key => "deleted_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_deleter?
 
           custom_operations.each do |operator_name, column|
+            foreign_key = operator_name.to_s.sub(/\wr$/, 'ed_by')
+
             define_method "set_#{operator_name}" do
               return unless send("#{column}_changed?") && operator.present?
-              send("#{column}=", operator.id)
+              send("#{foreign_key}=", operator.id)
             end
 
-            belongs_to operator_name, {foreign_key: operator_name.to_s.sub(/\wr$/, 'ed_by'), class_name: RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options])
+            belongs_to operator_name, {foreign_key: foreign_key, class_name: RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options])
             before_save "set_#{operator_name}"
           end
         end
