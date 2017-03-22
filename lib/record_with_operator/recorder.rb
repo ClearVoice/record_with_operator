@@ -36,14 +36,14 @@ module RecordWithOperator
           belongs_to :updater, {:foreign_key => "updated_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_updater?
           belongs_to :deleter, {:foreign_key => "deleted_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_deleter?
 
-          custom_operations.each do |operator, column|
-            define_method "set_#{operator}" do
+          custom_operations.each do |operator_name, column|
+            define_method "set_#{operator_name}" do
               return unless send("#{column}_changed?") && operator.present?
-              send("#{column}=", self.operator.id)
+              send("#{column}=", operator.id)
             end
 
-            belongs_to operator, {foreign_key: operator.to_s.sub(/\wr$/, 'ed_by'), class_name: RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options])
-            before_save "set_#{operator}"
+            belongs_to operator_name, {foreign_key: operator_name.to_s.sub(/\wr$/, 'ed_by'), class_name: RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options])
+            before_save "set_#{operator_name}"
           end
         end
       end
